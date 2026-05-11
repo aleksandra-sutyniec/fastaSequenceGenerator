@@ -51,14 +51,37 @@ def validate_positive_int(prompt: str, min_val: int = 1, max_val: int = 100_000)
 
         print(f"Error: value must be an integer in the range [{min_val}, {max_val}].")
 
+def validate_sequence_id(prompt: str) -> str:
+    """Gets a FASTA sequence ID from the user and checks that it contains no whitespace."""
+    while True:
+        seq_id = input(prompt).strip()
+
+        if not seq_id:
+            print("Error: sequence ID cannot be empty.")
+            continue
+
+        if any(character.isspace() for character in seq_id):
+            print("Error: sequence ID cannot contain whitespace.")
+            continue
+
+        return seq_id
+
 
 def main():
     """Controls the main program flow."""
     print("FASTA DNA sequence generator")
 
     sequence_length = validate_positive_int("Enter sequence length: ")
+    seq_id = validate_sequence_id("Enter sequence ID: ")
+    description = input("Enter a description of the sequence: ").strip()
 
     print(f"Selected sequence length: {sequence_length}")
+    print(f"Sequence ID: {seq_id}")
+
+    if description:
+        print(f"Description: {description}")
+    else:
+        print("Description: empty")
 
 
 if __name__ == "__main__":
