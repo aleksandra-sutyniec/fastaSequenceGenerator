@@ -26,6 +26,8 @@ def generate_sequence_with_distribution(length: int, weights: list[int]) -> str:
 
     return "".join(sequence_parts)
 
+
+
 def ask_yes_no(prompt: str) -> bool:
     """Asks a yes/no question and returns True for yes or False for no."""
     while True:
