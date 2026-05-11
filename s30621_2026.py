@@ -58,7 +58,19 @@ def print_stats(stats: dict, sequence_length: int) -> None:
 
 def insert_name(sequence: str, name: str) -> str:
     """Inserts a name at a random position in the sequence. Name written in lowercase letters."""
-    return sequence
+    cleaned_name = name.strip().lower()
+
+    if cleaned_name == "":
+        return sequence
+
+    # Position may be at the beginning, inside the sequence, or at the end.
+    insertion_position = random.randint(0, len(sequence))
+
+    return (
+        sequence[:insertion_position]
+        + cleaned_name
+        + sequence[insertion_position:]
+    )
 
 
 def format_fasta(seq_id: str, description: str, sequence: str, line_width: int = 80) -> str:
@@ -123,11 +135,17 @@ def main():
     sequence_length = validate_positive_int("Enter sequence length: ")
     seq_id = validate_sequence_id("Enter sequence ID: ")
     description = input("Enter a description of the sequence: ").strip()
+    user_name = input("Enter your name: ")
 
+    # The biological sequence contains only A, C, G and T.
+    # The inserted name is only a visual addition in the FASTA output.
     sequence = generate_sequence(sequence_length)
+    sequence_with_name = insert_name(sequence, user_name)
+
+    # Statistics are calculated only from the biological sequence.
     stats = calculate_stats(sequence)
 
-    fasta_text = format_fasta(seq_id, description, sequence)
+    fasta_text = format_fasta(seq_id, description, sequence_with_name)
     output_file_name = f"{seq_id}.fasta"
 
     save_text_to_file(output_file_name, fasta_text)
