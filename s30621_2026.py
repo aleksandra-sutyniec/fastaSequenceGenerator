@@ -15,6 +15,50 @@ def generate_sequence(length: int) -> str:
 
     return "".join(sequence_parts)
 
+def generate_sequence_with_distribution(length: int, weights: list[int]) -> str:
+    """Returns a random DNA sequence using user-defined nucleotide percentages."""
+    nucleotides = ["A", "C", "G", "T"]
+    sequence_parts = []
+
+    for _ in range(length):
+        selected_nucleotide = random.choices(nucleotides, weights=weights, k=1)[0]
+        sequence_parts.append(selected_nucleotide)
+
+    return "".join(sequence_parts)
+
+def ask_yes_no(prompt: str) -> bool:
+    """Asks a yes/no question and returns True for yes or False for no."""
+    while True:
+        answer = input(prompt).strip().lower()
+
+        if answer in ("y", "yes"):
+            return True
+
+        if answer in ("n", "no"):
+            return False
+
+        print("Error: enter y/yes or n/no.")
+
+
+def get_nucleotide_distribution() -> list[int]:
+    """
+    Gets nucleotide percentages from the user.
+    The sum of A, C, G and T percentages must be exactly 100.
+    """
+    while True:
+        print("Enter nucleotide distribution as percentages.")
+        percent_a = validate_positive_int("A percentage: ", 0, 100)
+        percent_c = validate_positive_int("C percentage: ", 0, 100)
+        percent_g = validate_positive_int("G percentage: ", 0, 100)
+        percent_t = validate_positive_int("T percentage: ", 0, 100)
+
+        total = percent_a + percent_c + percent_g + percent_t
+
+        if total == 100:
+            return [percent_a, percent_c, percent_g, percent_t]
+
+        print("Error: percentages must sum to 100.")
+
 
 def calculate_stats(sequence: str) -> dict:
     """
@@ -137,12 +181,19 @@ def main():
     description = input("Enter a description of the sequence: ").strip()
     user_name = input("Enter your name: ")
 
+    use_custom_distribution = ask_yes_no("Use custom nucleotide distribution? (y/n): ")
+
+    if use_custom_distribution:
+        nucleotide_weights = get_nucleotide_distribution()
+        sequence = generate_sequence_with_distribution(sequence_length, nucleotide_weights)
+    else:
+        sequence = generate_sequence(sequence_length)
+
     # The biological sequence contains only A, C, G and T.
     # The inserted name is only a visual addition in the FASTA output.
-    sequence = generate_sequence(sequence_length)
     sequence_with_name = insert_name(sequence, user_name)
 
-    # Statistics are calculated only from the biological sequence.
+    # Statistics are calculated only from the biological sequence, without the inserted name.
     stats = calculate_stats(sequence)
 
     fasta_text = format_fasta(seq_id, description, sequence_with_name)
