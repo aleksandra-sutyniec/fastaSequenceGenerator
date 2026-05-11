@@ -1,0 +1,6 @@
+>seq5 seq5
+GCTTannaGAACAGTG
+>seq5_complement complementary strand
+CGAACTTGTCAC
+>seq5_reverse_complement reverse complementary strand
+CACTGTTCAAGC

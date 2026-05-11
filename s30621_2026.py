@@ -116,6 +116,31 @@ def print_motif_results(motif: str, positions: list[int]) -> None:
     joined_positions = ", ".join(str(position) for position in positions)
     print(f"Motif {motif} found at positions: {joined_positions}")
 
+
+
+def get_complement(sequence: str) -> str:
+    """Returns the complementary DNA strand."""
+    complement_table = {
+        "A": "T",
+        "T": "A",
+        "C": "G",
+        "G": "C",
+    }
+
+    complement_parts = []
+
+    for nucleotide in sequence:
+        complement_parts.append(complement_table[nucleotide])
+
+    return "".join(complement_parts)
+
+
+def get_reverse_complement(sequence: str) -> str:
+    """Returns the reverse complementary DNA strand."""
+    complement = get_complement(sequence)
+    return complement[::-1]
+
+
 def calculate_stats(sequence: str) -> dict:
     """
     Returns a dictionary of sequence statistics.
@@ -248,14 +273,23 @@ def main():
     motif = get_motif_from_user()
     motif_positions = find_motif_positions(sequence, motif)
 
-    # The biological sequence contains only A, C, G and T.
-    # The inserted name is only a visual addition in the FASTA output.
+    # The inserted name is only a visual addition in the main FASTA record.
     sequence_with_name = insert_name(sequence, user_name)
+
+    # Additional records are calculated from the biological DNA sequence only.
+    complement_sequence = get_complement(sequence)
+    reverse_complement_sequence = get_reverse_complement(sequence)
 
     # Statistics are calculated only from the biological sequence, without the inserted name.
     stats = calculate_stats(sequence)
 
-    fasta_text = format_fasta(seq_id, description, sequence_with_name)
+    fasta_records = [
+        format_fasta(seq_id, description, sequence_with_name),
+        format_fasta(f"{seq_id}_complement", "complementary strand", complement_sequence),
+        format_fasta(f"{seq_id}_reverse_complement", "reverse complementary strand", reverse_complement_sequence),
+    ]
+
+    fasta_text = "".join(fasta_records)
     output_file_name = f"{seq_id}.fasta"
 
     save_text_to_file(output_file_name, fasta_text)
