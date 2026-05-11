@@ -60,6 +60,62 @@ def get_nucleotide_distribution() -> list[int]:
         print("Error: percentages must sum to 100.")
 
 
+def get_motif_from_user() -> str:
+    """Gets a DNA motif from the user and validates that it contains only A, C, G and T."""
+    while True:
+        motif = input("Enter motif to search for, or leave empty to skip: ").strip().upper()
+
+        if motif == "":
+            return ""
+
+        invalid_characters = [character for character in motif if character not in "ACGT"]
+
+        if invalid_characters:
+            print("Error: motif can contain only A, C, G and T.")
+            continue
+
+        return motif
+
+
+def find_motif_positions(sequence: str, motif: str) -> list[int]:
+    """
+    Finds all motif occurrences in the DNA sequence.
+    Positions are returned using 1-based biological indexing.
+    """
+    positions = []
+
+    if motif == "":
+        return positions
+
+    start_index = 0
+
+    while True:
+        found_index = sequence.find(motif, start_index)
+
+        if found_index == -1:
+            break
+
+        # Python indexes from 0, biology usually reports positions from 1.
+        positions.append(found_index + 1)
+
+        # Move by one to allow overlapping motifs, for example AAA in AAAAA.
+        start_index = found_index + 1
+
+    return positions
+
+def print_motif_results(motif: str, positions: list[int]) -> None:
+    """Prints motif search results."""
+    if motif == "":
+        print("Motif search skipped.")
+        return
+
+    if not positions:
+        print(f"Motif {motif} was not found in the sequence.")
+        return
+
+    joined_positions = ", ".join(str(position) for position in positions)
+    print(f"Motif {motif} found at positions: {joined_positions}")
+
 def calculate_stats(sequence: str) -> dict:
     """
     Returns a dictionary of sequence statistics.
@@ -189,6 +245,9 @@ def main():
     else:
         sequence = generate_sequence(sequence_length)
 
+    motif = get_motif_from_user()
+    motif_positions = find_motif_positions(sequence, motif)
+
     # The biological sequence contains only A, C, G and T.
     # The inserted name is only a visual addition in the FASTA output.
     sequence_with_name = insert_name(sequence, user_name)
@@ -203,6 +262,7 @@ def main():
 
     print(f"Sequence saved to file: {output_file_name}")
     print_stats(stats, sequence_length)
+    print_motif_results(motif, motif_positions)
 
 if __name__ == "__main__":
     main()
