@@ -37,12 +37,28 @@ def format_fasta(seq_id: str, description: str, sequence: str, line_width: int =
 
 def validate_positive_int(prompt: str, min_val: int = 1, max_val: int = 100_000) -> int:
     """Gets an integer from the user in a range. In case of an error, repeats the question."""
-    return min_val
+    while True:
+        user_value = input(prompt)
+
+        try:
+            number = int(user_value)
+        except ValueError:
+            print(f"Error: value must be an integer in the range [{min_val}, {max_val}].")
+            continue
+
+        if min_val <= number <= max_val:
+            return number
+
+        print(f"Error: value must be an integer in the range [{min_val}, {max_val}].")
 
 
 def main():
     """Controls the main program flow."""
     print("FASTA DNA sequence generator")
+
+    sequence_length = validate_positive_int("Enter sequence length: ")
+
+    print(f"Selected sequence length: {sequence_length}")
 
 
 if __name__ == "__main__":
