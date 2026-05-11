@@ -63,7 +63,25 @@ def insert_name(sequence: str, name: str) -> str:
 
 def format_fasta(seq_id: str, description: str, sequence: str, line_width: int = 80) -> str:
     """Returns a formatted FASTA record as a string."""
-    return ""
+    if description:
+        header = f">{seq_id} {description}"
+    else:
+        header = f">{seq_id}"
+
+    sequence_lines = []
+
+    # Split the sequence into fixed-width lines required by the FASTA format.
+    for start in range(0, len(sequence), line_width):
+        line = sequence[start:start + line_width]
+        sequence_lines.append(line)
+
+    return header + "\n" + "\n".join(sequence_lines) + "\n"
+
+
+def save_text_to_file(file_name: str, text: str) -> None:
+    """Saves text content to a file using UTF-8 encoding."""
+    with open(file_name, "w", encoding="utf-8") as output_file:
+        output_file.write(text)
 
 
 def validate_positive_int(prompt: str, min_val: int = 1, max_val: int = 100_000) -> int:
@@ -109,14 +127,12 @@ def main():
     sequence = generate_sequence(sequence_length)
     stats = calculate_stats(sequence)
 
-    print(f"Selected sequence length: {sequence_length}")
-    print(f"Sequence ID: {seq_id}")
+    fasta_text = format_fasta(seq_id, description, sequence)
+    output_file_name = f"{seq_id}.fasta"
 
-    if description:
-        print(f"Description: {description}")
-    else:
-        print("Description: empty")
+    save_text_to_file(output_file_name, fasta_text)
 
+    print(f"Sequence saved to file: {output_file_name}")
     print_stats(stats, sequence_length)
 
 if __name__ == "__main__":
