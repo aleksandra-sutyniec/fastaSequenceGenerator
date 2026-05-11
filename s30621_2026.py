@@ -141,6 +141,11 @@ def get_reverse_complement(sequence: str) -> str:
     return complement[::-1]
 
 
+def transcribe_dna_to_mrna(sequence: str) -> str:
+    """Returns an mRNA sequence transcribed from the DNA sequence."""
+    return sequence.replace("T", "U")
+
+
 def calculate_stats(sequence: str) -> dict:
     """
     Returns a dictionary of sequence statistics.
@@ -279,6 +284,7 @@ def main():
     # Additional records are calculated from the biological DNA sequence only.
     complement_sequence = get_complement(sequence)
     reverse_complement_sequence = get_reverse_complement(sequence)
+    mrna_sequence = transcribe_dna_to_mrna(sequence)
 
     # Statistics are calculated only from the biological sequence, without the inserted name.
     stats = calculate_stats(sequence)
@@ -287,6 +293,7 @@ def main():
         format_fasta(seq_id, description, sequence_with_name),
         format_fasta(f"{seq_id}_complement", "complementary strand", complement_sequence),
         format_fasta(f"{seq_id}_reverse_complement", "reverse complementary strand", reverse_complement_sequence),
+        format_fasta(f"{seq_id}_mRNA", "transcribed mRNA sequence", mrna_sequence),
     ]
 
     fasta_text = "".join(fasta_records)
